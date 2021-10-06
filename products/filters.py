@@ -4,18 +4,13 @@ from .models import Product, Review, Order, Collection
 
 class ProductFilter(filters.FilterSet):
     price = filters.RangeFilter()
-    desc = filters.CharFilter(
-        field_name='description',
-        lookup_expr='in'
-    )
-    name = filters.CharFilter(
-        field_name='name',
-        lookup_expr='in'
-    )
 
     class Meta:
         model = Product
-        fields = ['price', 'description', 'name']
+        fields = {
+            'name': ['contains'],
+            'description': ['contains']
+        }
 
 
 class ReviewFilter(filters.FilterSet):
