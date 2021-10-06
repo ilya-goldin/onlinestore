@@ -25,8 +25,10 @@ class ReviewViewSet(ModelViewSet):
     filter_backends = [DjangoFilterBackend]
 
     def get_permissions(self):
-        if self.action in ["create", "update", "partial_update", 'destroy']:
+        if self.action in ["update", "partial_update", 'destroy']:
             return [IsAdminUser(), IsCreator()]
+        elif self.action in ["create"]:
+            return [IsAuthenticated()]
         return []
 
 
