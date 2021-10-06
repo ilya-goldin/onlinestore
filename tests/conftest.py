@@ -1,14 +1,22 @@
 import pytest
 from rest_framework.test import APIClient
 from model_bakery import baker
+from random import randint
+from faker import Faker
 from products.models import Product, Collection, Review, Order, OrderProducts
+
+fake = Faker()
+Faker.seed(1)
 
 
 @pytest.fixture
 def api_client():
     """Фикстура для клиента API."""
 
-    return APIClient()
+    token = 'a36d1de423bd0f7c9028428754d889ecd1613f4f'
+    client = APIClient()
+    client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    return client
 
 
 @pytest.fixture
@@ -16,7 +24,15 @@ def products():
     """Фикстура для Product"""
 
     def func(qty=1):
-        return baker.make(Product, _quantity=qty)
+        out = []
+        for _ in range(qty):
+            out.append(baker.make(
+                Product,
+                name=fake.word(),
+                description=fake.text(),
+                price=randint(100, 10000)
+            ))
+        return out
     return func
 
 
