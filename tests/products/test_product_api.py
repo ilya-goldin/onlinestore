@@ -90,7 +90,6 @@ def test_user_create_products(api_client, products):
     })
 
     assert resp.status_code == HTTP_403_FORBIDDEN
-    resp_json = resp.json()
     q = Product.objects.all()
     assert q.count() == 1
 
@@ -107,7 +106,6 @@ def test_user_update_products(api_client, products):
     }, )
 
     assert resp.status_code == HTTP_405_METHOD_NOT_ALLOWED
-    resp_json = resp.json()
 
 
 @pytest.mark.django_db
@@ -118,4 +116,3 @@ def test_user_destroy_products(api_client, products):
     resp = api_client.post(url)
 
     assert resp.status_code == HTTP_405_METHOD_NOT_ALLOWED
-    resp_json = resp.json()
