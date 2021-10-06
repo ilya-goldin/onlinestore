@@ -14,21 +14,16 @@ class ProductFilter(filters.FilterSet):
 
 
 class ReviewFilter(filters.FilterSet):
-    user_id = filters.ModelChoiceFilter(
-        field_name='user',
-        to_field_name='user',
-        queryset=Review.objects.all(),
-    )
     product = filters.ModelChoiceFilter(
         field_name='product',
-        to_field_name='product',
+        to_field_name='id',
         queryset=Product.objects.all(),
     )
-    created_at = filters.DateFromToRangeFilter()
+    created_at = filters.DateTimeFromToRangeFilter()
 
     class Meta:
         model = Review
-        fields = ['user', 'created_at', 'product']
+        fields = ['user', 'product', 'created_at']
 
 
 class OrderFilter(filters.FilterSet):
