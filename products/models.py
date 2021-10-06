@@ -15,9 +15,12 @@ class Product(models.Model):
         blank=True,
         verbose_name='Description',
     )
-    price = models.PositiveIntegerField(
+    price = models.IntegerField(
         default=0,
         verbose_name='Price',
+        validators=[
+            MinValueValidator(0),
+        ],
     )
     created_at = models.DateTimeField(
         auto_now_add=True,
