@@ -1,7 +1,7 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.viewsets import ModelViewSet
-from .filters import ProductFilter
+from .filters import ProductFilter, ReviewFilter
 from .models import Product, Review, Order, Collection
 from .premissions import IsCreator
 from .serializers import ProductSerializer, ReviewSerializer, OrderSerializer, CollectionSerializer
@@ -23,6 +23,7 @@ class ReviewViewSet(ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     filter_backends = [DjangoFilterBackend]
+    filterset_class = ReviewFilter
 
     def get_permissions(self):
         if self.action in ["update", "partial_update", 'destroy']:
