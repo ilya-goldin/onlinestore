@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField
 from .models import Product, Review, Order, Collection
 
 
@@ -8,8 +8,7 @@ class UserSerializer(ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name',
-                  'last_name',)
+        fields = 'id', 'username', 'first_name', 'last_name'
 
 
 class ProductSerializer(ModelSerializer):
@@ -22,13 +21,18 @@ class ProductSerializer(ModelSerializer):
 
 class ReviewSerializer(ModelSerializer):
     """Serializer for the Review"""
+
     user = UserSerializer(
         read_only=True,
+    )
+    product_id = PrimaryKeyRelatedField(
+        source='product',
+        queryset=Product.objects.all(),
     )
 
     class Meta:
         model = Review
-        fields = 'user', 'review_text', 'product', 'score', 'created_at', 'updated_at'
+        fields = 'user', 'review_text', 'product_id', 'score', 'created_at', 'updated_at'
 
     def create(self, validated_data):
         validated_data['user'] = self.context['request'].user
@@ -36,6 +40,8 @@ class ReviewSerializer(ModelSerializer):
 
 
 class OrderSerializer(ModelSerializer):
+    """Serializer for the Order"""
+
     user = UserSerializer(
         read_only=True,
     )
