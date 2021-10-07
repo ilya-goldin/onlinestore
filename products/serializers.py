@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField
+from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField, ValidationError
 from .models import Product, Review, Order, Collection
 
 
@@ -35,6 +35,10 @@ class ReviewSerializer(ModelSerializer):
         fields = 'user', 'review_text', 'product_id', 'score', 'created_at', 'updated_at'
 
     def create(self, validated_data):
+        user = User.objects.get(id=self.context['request'].user.id)
+        reviews = user.reviews.filter(product_id=validated_data.get('product').id)
+        if list(reviews):
+            raise ValidationError('You can leave only one review for each product ')
         validated_data['user'] = self.context['request'].user
         return super().create(validated_data)
 
