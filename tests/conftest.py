@@ -2,6 +2,7 @@ import pytest
 from rest_framework.test import APIClient
 from model_bakery import baker
 from faker import Faker
+from random import randint
 from products.models import Product, Collection, Review, Order
 
 fake = Faker()
@@ -23,11 +24,11 @@ def products():
     """Фикстура для Product"""
 
     def func(qty=1):
+        Faker.seed(randint(0, 500))
         out = []
         for _ in range(qty):
             out.append(baker.make(
                 Product,
-                name=fake.word(),
                 description=fake.text(),
                 price=fake.pyint(min_value=100, max_value=10000),
             ))
@@ -39,13 +40,15 @@ def products():
 def reviews():
     """Фикстура для Review"""
 
-    def func(qty=1):
+    def func(qty=1, **kwargs):
+        Faker.seed(randint(0, 500))
         out = []
         for _ in range(qty):
             out.append(baker.make(
                 Review,
                 review_text=fake.text(),
                 score=fake.pyint(min_value=1, max_value=5),
+                **kwargs,
             ))
         return out
     return func
