@@ -58,11 +58,35 @@ class OrderSerializer(ModelSerializer):
 
     class Meta:
         model = Order
+        read_only_fields = 'create_date', 'update_date'
         fields = 'status', 'order_value', 'created_at', 'updated_at', 'product'
 
     def create(self, validated_data):
         validated_data['user'] = self.context['request'].user
-        return super().create(validated_data)
+        validated_data['order_value'] = 0
+        products = validated_data.pop('orderproducts_set')
+        for prod in products:
+            validated_data['order_value'] += prod['product'].price * prod['qty']
+        order = Order.objects.create(**validated_data)
+        orderproducts = [OrderProducts(order=order, **product) for product in products]
+        OrderProducts.objects.bulk_create(orderproducts)
+        return order
+
+    def update(self, instance, validated_data):
+        products = validated_data.pop('orderproducts_set')
+        order_value = 0
+        for prod in products:
+            order_value += prod['product'].price * prod['qty']
+        instance.order_value = order_value
+        if 'status' in validated_data:
+            if self.context['request'].user.is_staff:
+                instance.status = validated_data.pop('status')
+            else:
+                raise ValidationError('You can`n change order status!')
+        instance.save()
+        orderproducts = [OrderProducts(order=instance, **product) for product in products]
+        OrderProducts.objects.bulk_create(orderproducts)
+        return instance
 
 
 class CollectionSerializer(ModelSerializer):
