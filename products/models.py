@@ -97,6 +97,13 @@ class Order(models.Model):
         verbose_name='User',
         related_name='orders',
     )
+    products = models.ManyToManyField(
+        Product,
+        through='OrderProducts',
+        through_fields=('order', 'product'),
+        related_name='order',
+        verbose_name='Products'
+    )
     status = models.TextField(
         choices=OrderStatusChoices.choices,
         default=OrderStatusChoices.NEW,
@@ -123,11 +130,10 @@ class OrderProducts(models.Model):
     order = models.ForeignKey(
         Order,
         on_delete=models.CASCADE,
-        related_name='items',
     )
     product = models.ForeignKey(
         Product,
-        on_delete=models.RESTRICT,
+        on_delete=models.CASCADE,
     )
     qty = models.PositiveIntegerField(
         default=1,
@@ -155,3 +161,6 @@ class Collection(models.Model):
         auto_now=True,
         verbose_name='Date updated',
     )
+
+    def __str__(self):
+        return self.title
