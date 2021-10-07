@@ -1,4 +1,5 @@
 import pytest
+from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 from model_bakery import baker
 from faker import Faker
@@ -16,6 +17,18 @@ def api_client():
     token = 'a36d1de423bd0f7c9028428754d889ecd1613f4f'
     client = APIClient()
     client.credentials(HTTP_AUTHORIZATION='Token ' + token)
+    user = User.objects.create(username='lauren', password='123secret123',)
+    client.force_authenticate(user=user)
+    return client
+
+
+@pytest.fixture
+def api_client_admin():
+    """Фикстура для admin API"""
+
+    client = APIClient()
+    user = User.objects.create(username='admin_user', password='admin_password', is_staff=True)
+    client.force_authenticate(user=user)
     return client
 
 
@@ -61,6 +74,19 @@ def collections():
     def func(qty=1, **kwargs):
         return baker.make(
             Collection,
+            _quantity=qty,
+            **kwargs,
+        )
+    return func
+
+
+@pytest.fixture
+def orders():
+    """Фикстура для Order"""
+
+    def func(qty=1, **kwargs):
+        return baker.make(
+            Order,
             _quantity=qty,
             **kwargs,
         )
