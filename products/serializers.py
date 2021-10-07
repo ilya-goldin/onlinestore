@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField, ValidationError
-from .models import Product, Review, Order, Collection
+from .models import Product, Review, Order, OrderProducts, Collection
 
 
 class UserSerializer(ModelSerializer):
@@ -43,16 +43,22 @@ class ReviewSerializer(ModelSerializer):
         return super().create(validated_data)
 
 
+class OrderProductSerializer(ModelSerializer):
+    """Serializer for the OrderProduct"""
+
+    class Meta:
+        model = OrderProducts
+        fields = 'id', 'product', 'qty'
+
+
 class OrderSerializer(ModelSerializer):
     """Serializer for the Order"""
 
-    user = UserSerializer(
-        read_only=True,
-    )
+    product = OrderProductSerializer(source='orderproducts_set', many=True)
 
     class Meta:
         model = Order
-        fields = 'user', 'status', 'order_value', 'created_at', 'updated_at', 'items'
+        fields = 'status', 'order_value', 'created_at', 'updated_at', 'product'
 
     def create(self, validated_data):
         validated_data['user'] = self.context['request'].user
@@ -60,6 +66,8 @@ class OrderSerializer(ModelSerializer):
 
 
 class CollectionSerializer(ModelSerializer):
+    """Serializer for the Collection"""
+
     class Meta:
         model = Collection
         fields = 'title', 'note', 'items', 'created_at', 'updated_at'
