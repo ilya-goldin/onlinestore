@@ -1,7 +1,6 @@
 import pytest
 from django.urls import reverse
-from rest_framework.status import HTTP_200_OK, HTTP_403_FORBIDDEN, \
-    HTTP_405_METHOD_NOT_ALLOWED
+from rest_framework.status import HTTP_200_OK, HTTP_403_FORBIDDEN
 from products.models import Product
 
 
@@ -99,13 +98,13 @@ def test_user_update_products(api_client, products):
     prods = products()[0]
     url = reverse('products-detail', args=(prods.id,))
 
-    resp = api_client.post(url, {
+    resp = api_client.patch(url, {
         'name': 'Name 1',
         'description': 'Description 1',
         'price': 1
     }, )
 
-    assert resp.status_code == HTTP_405_METHOD_NOT_ALLOWED
+    assert resp.status_code == HTTP_403_FORBIDDEN
 
 
 @pytest.mark.django_db
@@ -113,6 +112,6 @@ def test_user_destroy_products(api_client, products):
     prods = products()[0]
     url = reverse('products-detail', args=(prods.id,))
 
-    resp = api_client.post(url)
+    resp = api_client.delete(url)
 
-    assert resp.status_code == HTTP_405_METHOD_NOT_ALLOWED
+    assert resp.status_code == HTTP_403_FORBIDDEN
