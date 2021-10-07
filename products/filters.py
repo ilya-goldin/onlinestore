@@ -30,6 +30,7 @@ class OrderFilter(filters.FilterSet):
     status = filters.ChoiceFilter(
         choices=OrderStatusChoices.choices
     )
+    order_value = filters.RangeFilter()
     created_at = filters.DateFromToRangeFilter()
     updated_at = filters.DateFromToRangeFilter()
 
