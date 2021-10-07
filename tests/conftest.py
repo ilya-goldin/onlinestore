@@ -58,6 +58,10 @@ def reviews():
 def collections():
     """Фикстура для Collection"""
 
-    def func(qty=1):
-        return baker.make(Collection, _quantity=qty)
+    def func(qty=1, **kwargs):
+        return baker.make(
+            Collection,
+            _quantity=qty,
+            **kwargs,
+        )
     return func
