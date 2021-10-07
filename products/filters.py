@@ -1,5 +1,5 @@
 from django_filters import rest_framework as filters
-from .models import Product, Review, Order, Collection
+from .models import Product, Review, Order, OrderStatusChoices
 
 
 class ProductFilter(filters.FilterSet):
@@ -27,9 +27,12 @@ class ReviewFilter(filters.FilterSet):
 
 
 class OrderFilter(filters.FilterSet):
+    status = filters.ChoiceFilter(
+        choices=OrderStatusChoices.choices
+    )
     created_at = filters.DateFromToRangeFilter()
     updated_at = filters.DateFromToRangeFilter()
 
     class Meta:
         model = Order
-        fields = ['status', 'order_value', 'created_at', 'updated_at', 'items']
+        fields = ['status', 'order_value', 'created_at', 'updated_at']
