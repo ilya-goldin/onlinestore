@@ -1,0 +1,89 @@
+GET /api/v1/products/ HTTP/1.1
+Host: 127.0.0.1:8000
+Authorization: Token 511ecc7ad9bf178314e5835dadaa40dbd964a6d6
+Content-Length: 38
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+
+GET /api/v1/products/43/ HTTP/1.1
+Host: 127.0.0.1:8000
+Authorization: Token 511ecc7ad9bf178314e5835dadaa40dbd964a6d6
+Content-Length: 38
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+
+GET /api/v1/products/?name__contains=on HTTP/1.1
+Host: 127.0.0.1:8000
+Authorization: Token 511ecc7ad9bf178314e5835dadaa40dbd964a6d6
+Content-Length: 38
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+
+GET /api/v1/products/?description__contains=word HTTP/1.1
+Host: 127.0.0.1:8000
+Authorization: Token 511ecc7ad9bf178314e5835dadaa40dbd964a6d6
+Content-Length: 38
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+
+GET /api/v1/products/?price_min=600000 HTTP/1.1
+Host: 127.0.0.1:8000
+Authorization: Token 511ecc7ad9bf178314e5835dadaa40dbd964a6d6
+Content-Length: 38
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+
+GET /api/v1/products/?price_max=10000 HTTP/1.1
+Host: 127.0.0.1:8000
+Authorization: Token 511ecc7ad9bf178314e5835dadaa40dbd964a6d6
+Content-Length: 38
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+
+GET /api/v1/product-reviews/ HTTP/1.1
+Host: 127.0.0.1:8000
+Authorization: Token 511ecc7ad9bf178314e5835dadaa40dbd964a6d6
+Content-Length: 38
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+
+GET /api/v1/product-reviews/?user=13 HTTP/1.1
+Host: 127.0.0.1:8000
+Authorization: Token 511ecc7ad9bf178314e5835dadaa40dbd964a6d6
+Content-Length: 38
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+
+GET /api/v1/product-reviews/?product=44 HTTP/1.1
+Host: 127.0.0.1:8000
+Authorization: Token 511ecc7ad9bf178314e5835dadaa40dbd964a6d6
+Content-Length: 38
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+
+GET /api/v1/product-reviews/?created_at_after=2021-10-08 HTTP/1.1
+Host: 127.0.0.1:8000
+Authorization: Token 511ecc7ad9bf178314e5835dadaa40dbd964a6d6
+Content-Length: 38
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+
+POST /api/v1/product-reviews/ HTTP/1.1
+Host: 127.0.0.1:8000
+Authorization: Token 511ecc7ad9bf178314e5835dadaa40dbd964a6d6
+Content-Length: 311
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+----WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="review_text"
+
+Text
+----WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="score"
+
+4
+----WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="product_id"
+
+15
+----WebKitFormBoundary7MA4YWxkTrZu0gW
