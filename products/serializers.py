@@ -1,5 +1,7 @@
 from django.contrib.auth.models import User
-from rest_framework.serializers import ModelSerializer, PrimaryKeyRelatedField, ValidationError
+from rest_framework.authtoken.models import Token
+from rest_framework.serializers import ModelSerializer,\
+    PrimaryKeyRelatedField, ValidationError, CharField
 from .models import Product, Review, Order, OrderProducts, Collection
 
 
@@ -95,3 +97,14 @@ class CollectionSerializer(ModelSerializer):
     class Meta:
         model = Collection
         fields = 'title', 'note', 'items', 'created_at', 'updated_at'
+
+
+class TokenSerializer(ModelSerializer):
+    username = UserSerializer(
+        read_only=True,
+    )
+    password = CharField()
+
+    class Meta:
+        model = Token
+        fields = 'username', 'password'
