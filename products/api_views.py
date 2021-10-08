@@ -1,10 +1,16 @@
+from django.contrib.auth.hashers import check_password
 from django_filters.rest_framework import DjangoFilterBackend
+from django.contrib.auth.models import User
+from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 from .filters import ProductFilter, ReviewFilter, OrderFilter
 from .models import Product, Review, Order, Collection
 from .premissions import IsCreator, IsOrderCreator
-from .serializers import ProductSerializer, ReviewSerializer, OrderSerializer, CollectionSerializer
+from .serializers import ProductSerializer, ReviewSerializer,\
+    OrderSerializer, CollectionSerializer, TokenSerializer
+from rest_framework.authtoken.models import Token
 
 
 class ProductViewSet(ModelViewSet):
@@ -82,3 +88,30 @@ class CollectionViewSet(ModelViewSet):
         if self.action in ['create', 'update', 'partial_update', 'destroy']:
             return [IsAdminUser()]
         return []
+
+
+class TokenViewSet(ModelViewSet):
+    queryset = Token.objects.all()
+    serializer_class = TokenSerializer
+
+    def get_permissions(self):
+        if self.action == 'list':
+            return [IsAuthenticated()]
+        return [IsAdminUser()]
+
+    def get_queryset(self):
+        username = self.request.query_params.get('username')
+        password = self.request.query_params.get('password')
+        try:
+            user = User.objects.get(username=username)
+        except BaseException as e:
+            raise ValidationError({"400": f'{str(e)}'})
+        if not check_password(password, user.password):
+            raise ValidationError({"message": "Incorrect Login credentials"})
+
+        token = Token.objects.get_or_create(user=user)[0].key
+        if user and user.is_active:
+            resp = {"token": token}
+            return Response(resp)
+        else:
+            raise ValidationError({"400": f'Account not active or doesnt exist'})
