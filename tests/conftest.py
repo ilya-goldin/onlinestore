@@ -1,4 +1,5 @@
 import pytest
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import User
 from rest_framework.test import APIClient
 from model_bakery import baker
@@ -17,7 +18,8 @@ def api_client():
     token = 'a36d1de423bd0f7c9028428754d889ecd1613f4f'
     client = APIClient()
     client.credentials(HTTP_AUTHORIZATION='Token ' + token)
-    user = User.objects.create(username='lauren', password='123secret123',)
+    user = User.objects.create(username='lauren')
+    user.password = make_password('123_secret_123')
     client.force_authenticate(user=user)
     return client
 
