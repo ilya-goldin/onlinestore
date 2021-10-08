@@ -27,4 +27,4 @@ Run server
     
 ## Tests coverage
 
-![Tests coverage screenshot](htmlcov/Screenshot%20from%202021-10-08.png)
+![Tests coverage screenshot](src/Screenshot%20from%202021-10-08.png)
