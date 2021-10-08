@@ -1,6 +1,6 @@
+import pytest
 from random import randint
 from datetime import date
-import pytest
 from django.urls import reverse
 from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED,\
     HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND
@@ -36,8 +36,8 @@ def test_retrieve_admin_order(api_client_admin, orders):
 @pytest.mark.django_db
 def test_user_list_order(api_client, orders):
     user = User.objects.get(username='lauren')
-    order = orders(qty=5)
-    user_order = orders(qty=5, user=user)[0]
+    orders(qty=5)
+    orders(qty=5, user=user)
     url = reverse('orders-list')
 
     resp = api_client.get(url)
@@ -49,7 +49,7 @@ def test_user_list_order(api_client, orders):
 
 @pytest.mark.django_db
 def test_admin_list_order(api_client_admin, orders):
-    order = orders(qty=10)
+    orders(qty=10)
     url = reverse('orders-list')
 
     resp = api_client_admin.get(url)
@@ -216,3 +216,18 @@ def test_updated_at_filter_order(api_client, orders):
     assert len(before_json) == 0
 
 
+@pytest.mark.django_db
+def test_product_filter_order(api_client, orders, products):
+    user = User.objects.get(username='lauren')
+    orders(user=user, products=products(qty=5))
+    orders(user=user)
+    product = Product.objects.first().id
+    url = reverse('orders-list')
+
+    resp = api_client.get(url, {
+        'products': product,
+    })
+    resp_json = resp.json()
+
+    assert resp.status_code == HTTP_200_OK
+    assert len(resp_json) == 1
