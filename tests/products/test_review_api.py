@@ -71,8 +71,7 @@ def test_user_create_review(api_client, products):
 
 @pytest.mark.django_db
 def test_user_update_review(api_client, reviews):
-    user = User.objects.create(username='lauren3', password='123secret123')
-    api_client.force_authenticate(user=user)
+    user = User.objects.get(username='lauren')
     review_1 = reviews(user=user)[0]
     review_2 = reviews()[0]
     url_1 = reverse('product-reviews-detail', args=(review_1.id,))
@@ -93,8 +92,7 @@ def test_user_update_review(api_client, reviews):
 
 @pytest.mark.django_db
 def test_user_destroy_review(api_client, reviews):
-    user = User.objects.create(username='lauren3', password='123secret123')
-    api_client.force_authenticate(user=user)
+    user = User.objects.get(username='lauren')
     review_1 = reviews(user=user)[0]
     review_2 = reviews()[0]
     url_1 = reverse('product-reviews-detail', args=(review_1.id,))
