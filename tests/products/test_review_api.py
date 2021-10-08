@@ -1,6 +1,6 @@
 import pytest
 from datetime import datetime as dt
-from random import randint
+from random import choice
 from django.urls import reverse
 from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED,\
     HTTP_204_NO_CONTENT, HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN
@@ -9,14 +9,14 @@ from django.contrib.auth.models import User
 
 
 @pytest.mark.django_db
-def test_first_review(api_client, reviews):
-    review = reviews(qty=30)[3]
+def test_retrieve_review(api_client, reviews):
+    review = reviews(qty=5)[3]
     url = reverse('product-reviews-detail', args=(review.id,))
 
     resp = api_client.get(url)
+    resp_json = resp.json()
 
     assert resp.status_code == HTTP_200_OK
-    resp_json = resp.json()
     assert resp_json.get('user').get('username') == review.user.username
     assert resp_json.get('product_id') == review.product.id
     assert resp_json.get('review_text') == review.review_text
@@ -25,15 +25,15 @@ def test_first_review(api_client, reviews):
 
 @pytest.mark.django_db
 def test_list_review(api_client, reviews):
-    review = reviews(qty=20)
+    review = reviews(qty=10)
     url = reverse('product-reviews-list')
 
     resp = api_client.get(url)
+    resp_json = resp.json()
 
     assert resp.status_code == HTTP_200_OK
-    resp_json = resp.json()
-    assert len(resp_json) == 20
-    for i in range(20):
+    assert len(resp_json) == 10
+    for i in range(10):
         assert resp_json[i].get('user').get('username') == review[i].user.username
         assert resp_json[i].get('product_id') == review[i].product.id
         assert resp_json[i].get('review_text') == review[i].review_text
@@ -41,56 +41,7 @@ def test_list_review(api_client, reviews):
 
 
 @pytest.mark.django_db
-def test_user_id_filter_review(api_client, reviews):
-    review = reviews(qty=20)
-    url = reverse('product-reviews-list')
-
-    user_id = User.objects.first().id
-    resp = api_client.get(url, {'user': user_id})
-
-    assert resp.status_code == HTTP_200_OK
-    resp_json = resp.json()
-    for i in resp_json:
-        assert i.get('user').get('id') == user_id
-
-
-@pytest.mark.django_db
-def test_product_id_filter_review(api_client):
-    url = reverse('product-reviews-list')
-
-    product_id = randint(1, 50)
-    resp = api_client.get(url, {'product_id': product_id})
-
-    assert resp.status_code == HTTP_200_OK
-    resp_json = resp.json()
-    for i in resp_json:
-        assert i.get('user').get('id') == product_id
-
-
-@pytest.mark.django_db
-def test_date_filter_review(api_client, reviews):
-    review = reviews(qty=20)
-    url = reverse('product-reviews-list')
-
-    created_at_after = api_client.get(url, {
-        'created_at_after': dt.now().strftime('%Y-%m-%dT%H:%M')
-    })
-    created_at_before = api_client.get(url, {
-        'created_at_before': dt.now().strftime('%Y-%m-%dT%H:%M')
-    })
-
-    assert created_at_after.status_code == HTTP_200_OK
-    resp_json = created_at_after.json()
-    assert len(resp_json) == 20
-    assert created_at_before.status_code == HTTP_200_OK
-    resp_json = created_at_before.json()
-    assert len(resp_json) == 0
-
-
-@pytest.mark.django_db
 def test_user_create_review(api_client, products):
-    user = User.objects.create(username='lauren2', password='123secret123')
-    api_client.force_authenticate(user=user)
     url = reverse('product-reviews-list')
     prod_1 = products()[0].id
     prod_2 = products()[0].id
@@ -102,14 +53,14 @@ def test_user_create_review(api_client, products):
         'score': 1
     })
     resp_2 = api_client.post(url, {
-        'product_id': prod,
+        'product_id': prod_1,
         'review_text': 'Description 2',
         'score': 2
     })
     resp_3 = api_client.post(url, {
         'product_id': prod_2,
-        'review_text': 'Description 2',
-        'score': 2
+        'review_text': 'Description 3',
+        'score': 3
     })
 
     assert resp_1.status_code == HTTP_201_CREATED
@@ -119,7 +70,7 @@ def test_user_create_review(api_client, products):
 
 
 @pytest.mark.django_db
-def test_user_update_review(api_client, products, reviews):
+def test_user_update_review(api_client, reviews):
     user = User.objects.create(username='lauren3', password='123secret123')
     api_client.force_authenticate(user=user)
     review_1 = reviews(user=user)[0]
@@ -141,7 +92,7 @@ def test_user_update_review(api_client, products, reviews):
 
 
 @pytest.mark.django_db
-def test_user_destroy_review(api_client, products, reviews):
+def test_user_destroy_review(api_client, reviews):
     user = User.objects.create(username='lauren3', password='123secret123')
     api_client.force_authenticate(user=user)
     review_1 = reviews(user=user)[0]
@@ -154,3 +105,51 @@ def test_user_destroy_review(api_client, products, reviews):
 
     assert resp_1.status_code == HTTP_204_NO_CONTENT
     assert resp_2.status_code == HTTP_403_FORBIDDEN
+
+
+@pytest.mark.django_db
+def test_user_id_filter_review(api_client, reviews):
+    reviews(qty=20)
+    user_id = User.objects.first().id
+    url = reverse('product-reviews-list')
+
+    resp = api_client.get(url, {'user': user_id})
+    resp_json = resp.json()
+
+    assert resp.status_code == HTTP_200_OK
+    for i in resp_json:
+        assert i.get('user').get('id') == user_id
+
+
+@pytest.mark.django_db
+def test_product_id_filter_review(api_client, reviews):
+    reviews(qty=5)
+    url = reverse('product-reviews-list')
+    product_id = choice(Product.objects.all().values_list('id', flat=True))
+
+    resp = api_client.get(url, {'product': product_id})
+    resp_json = resp.json()
+
+    assert resp.status_code == HTTP_200_OK
+    for i in resp_json:
+        assert i.get('product_id') == product_id
+
+
+@pytest.mark.django_db
+def test_date_filter_review(api_client, reviews):
+    reviews(qty=20)
+    url = reverse('product-reviews-list')
+
+    created_at_after = api_client.get(url, {
+        'created_at_after': dt.now().strftime('%Y-%m-%dT%H:%M')
+    })
+    created_at_before = api_client.get(url, {
+        'created_at_before': dt.now().strftime('%Y-%m-%dT%H:%M')
+    })
+
+    assert created_at_after.status_code == HTTP_200_OK
+    resp_json = created_at_after.json()
+    assert len(resp_json) == 20
+    assert created_at_before.status_code == HTTP_200_OK
+    resp_json = created_at_before.json()
+    assert len(resp_json) == 0
